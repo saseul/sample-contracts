@@ -1,0 +1,42 @@
+;;;
+; Copyright by ArtiFriends Inc.
+; All rights reserved.
+;;;
+
+; This variable is the path to keep the log.
+; You can write relative paths or absolute paths.
+[Directory]
+log_file = "saseul.log"
+err_file = "debug.log"
+data_dir = "data"
+
+; full | partial
+; full: When the capacity is full, it stops the node without erasing the data.
+; partial: When the capacity is full, keep only a partial of the data.
+[Node]
+ledger_type = "partial"
+database = false
+mining = false
+
+[Storage]
+data_dir = "data"
+
+[Database]
+mysql_host = "localhost"
+mysql_port = "3306"
+mysql_user = ""
+mysql_password = ""
+mysql_database = ""
+
+; The starting point of the peer search.
+; If not, scan all IPs.
+[Network]
+peers[] = "main.saseul.net"
+peers[] = "aroma.saseul.net"
+peers[] = "blanc.saseul.net"
+
+; This is information of genesis block.
+network_name = "SASEUL PUBLIC NETWORK"
+system_nonce = "Fiat lux. "
+genesis_address = "c63e540b26715f490d763338f1b3f1f60990935f0837"
+manager_addresses[] = "c63e540b26715f490d763338f1b3f1f60990935f0837"
