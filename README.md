@@ -77,4 +77,13 @@ Please enter the private key to import.
 $ node ./tools/display-keypair
 ```
 
+You can view information of other token issuance contracts using the 'cid-token-get-info' script.
+
+```shell
+$ node ./tools/cid-token-get-info
+
+Please enter the cid.
+<cid>
+```
+
 Each script refers to the saseul.ini file, and the default setting is saseul.ini-test.
