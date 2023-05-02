@@ -24,7 +24,7 @@ function sleep(ms) {
     let decimal = parseInt(prompt());
 
     let root = path.dirname(__dirname);
-    let _input = await fs.promises.readFile(root + "/saseul.ini-test", { encoding: "utf-8" });
+    let _input = await fs.promises.readFile(root + "/saseul.ini", { encoding: "utf-8" });
     let parser = new ConfigIniParser();
 
     parser.parse(_input);
@@ -39,23 +39,27 @@ function sleep(ms) {
     let cid = SASEUL.Enc.cid(keypair.address, space);
     let result;
 
-    result = await SASEUL.Rpc.sendTransaction(SASEUL.Rpc.signedTransaction({
-        "cid": cid,
-        "type": "Mint",
-        "name": name,
-        "symbol": symbol,
-        "amount": amount,
-        "decimal": decimal,
-    }, keypair.private_key));
+    result = await SASEUL.Rpc.broadcastTransaction(
+        SASEUL.Rpc.signedTransaction({
+            "cid": cid,
+            "type": "Mint",
+            "name": name,
+            "symbol": symbol,
+            "amount": amount,
+            "decimal": decimal,
+        }, keypair.private_key)
+    );
     console.dir(result);
 
     if (result.code === 200) {
         await sleep(3000);
 
-        result = await SASEUL.Rpc.request(SASEUL.Rpc.signedRequest({
-            "cid": cid,
-            "type": "GetInfo",
-        }, keypair.private_key));
+        result = await SASEUL.Rpc.request(
+            SASEUL.Rpc.signedRequest({
+                "cid": cid,
+                "type": "GetInfo",
+            }, keypair.private_key)
+        );
         console.dir(result);
     }
 })();

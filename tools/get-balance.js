@@ -5,7 +5,7 @@ const ConfigIniParser = require('config-ini-parser').ConfigIniParser;
 
 (async function () {
     let root = path.dirname(__dirname);
-    let _input = await fs.promises.readFile(root + "/saseul.ini-test", { encoding: "utf-8" });
+    let _input = await fs.promises.readFile(root + "/saseul.ini", { encoding: "utf-8" });
     let parser = new ConfigIniParser();
 
     parser.parse(_input);

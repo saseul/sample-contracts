@@ -9,7 +9,7 @@ function sleep(ms) {
 
 (async function () {
     let root = path.dirname(__dirname);
-    let _input = await fs.promises.readFile(root + "/saseul.ini-test", { encoding: "utf-8" });
+    let _input = await fs.promises.readFile(root + "/saseul.ini", { encoding: "utf-8" });
     let parser = new ConfigIniParser();
 
     parser.parse(_input);
@@ -23,7 +23,7 @@ function sleep(ms) {
 
     let result;
 
-    result = await SASEUL.Rpc.sendTransaction(
+    result = await SASEUL.Rpc.broadcastTransaction(
         SASEUL.Rpc.signedTransaction({
             "type": "Faucet"
         }, keypair.private_key)
