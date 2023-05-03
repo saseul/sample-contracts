@@ -1,19 +1,36 @@
-# Sample Contracts
+# SASEUL Sample Contracts
+
+Here is a sample contract that can be used on the SASEUL Network.
+
+This sample contract utilizes [SASEUL JS](https://www.npmjs.com/package/saseul).
+
+With SASEUL JS, you can broadcast transactions to the network without installing a SASEUL node.
+
+For more information on SASEUL JS, please refer to the [Documentation](https://docs.saseul.com/)!
+
+Alternatively, if you wish to install a SASEUL node, follow the installation instructions for [SASEUL Docker](https://hub.docker.com/r/artifriends/saseul-network).
 
 ## Overview
 
-We are releasing sample contracts that can be used on the SASEUL network. 
+The following is the process for deploying a contract on the SASEUL Network:
 
-Please refer to the link below:
+1. Write the contract according to the established rules.
+2. Generate a Publish transaction with the written code.
+3. Broadcast the Publish transaction.
 
-- Block Explorer (Test-net): https://explorer.saseul.com/test-net.html
-- Documentation: https://docs.saseul.com/
+The [Publish](https://github.com/saseul/sample-contracts/blob/master/system/main-net/publish.js) method for deploying contracts is also written as a contract.
 
-## Usage
+## Tools
 
-You can issue your own tokens by running the script under 'tools'.
+Understanding the process of deploying contracts on the SASEUL Network can be facilitated with the help of some tools.
 
-Please install [node.js](https://nodejs.org/) to run the script.
+[Node.js](https://nodejs.org/) must be installed for these tools to run.
+
+Please follow the installation guide on the official [Node.js](https://nodejs.org/) website.
+
+The execution results of the scripts can be verified on the [Test-net block explorer](https://explorer.saseul.com/test-net.html).
+
+### Usage
 
 ```shell
 $ npm install
