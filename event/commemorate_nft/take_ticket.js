@@ -9,7 +9,7 @@ function takeTicket(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "TakeTicket",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -28,7 +28,7 @@ function takeTicket(writer, space) {
     let output_id = op.load_param('output_id');
 
     let exchanger = op.read_universal('exchanger', output_id);
-    let balance = op.read_universal(op.concat(['balance_', output_id]), from, '0');
+    let balance = op.read_universal(op.concat(['balance_', from]), output_id, '0');
     let supply = op.read_universal('supply', output_id, '0');
 
     // exchanger !== null
@@ -58,7 +58,7 @@ function takeTicket(writer, space) {
 
     // balance = balance + 1
     balance = op.add([ balance, '1' ]);
-    update = op.write_universal(op.concat(['balance_', output_id]), from, balance);
+    update = op.write_universal(op.concat(['balance_', from]), output_id, balance);
     method.addExecution(update);
 
     return method;

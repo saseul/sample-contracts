@@ -9,7 +9,7 @@ function deposit(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Deposit",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -56,6 +56,10 @@ function deposit(writer, space) {
 
     // owner = deposited;
     update = op.write_universal('owner', uuid, 'deposited');
+    method.addExecution(update);
+
+    // inventory: from = false
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, false);
     method.addExecution(update);
 
     // set order

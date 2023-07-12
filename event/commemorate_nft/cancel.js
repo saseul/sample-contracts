@@ -9,7 +9,7 @@ function cancel(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Cancel",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -51,6 +51,10 @@ function cancel(writer, space) {
 
     // owner = from;
     update = op.write_universal('owner', order_uuid, order_from);
+    method.addExecution(update);
+
+    // inventory: from = true
+    update = op.write_universal(op.concat(['inventory_', order_from]), order_uuid, true);
     method.addExecution(update);
 
     // set order

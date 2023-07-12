@@ -9,7 +9,7 @@ function mint(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Mint",
-        "version": "3",
+        "version": "4",
         "space": space,
         "writer": writer,
     });
@@ -23,7 +23,7 @@ function mint(writer, space) {
     let tx_hash = op.load_param('hash');
     let uuid = op.id_hash(tx_hash);
 
-    let ticket_balance = op.read_universal(op.concat(['balance_', template_id]), from, '0');
+    let ticket_balance = op.read_universal(op.concat(['balance_', from]), template_id, '0');
     let owner = op.read_universal('owner', uuid);
 
     // balance > 0
@@ -52,9 +52,13 @@ function mint(writer, space) {
     update = op.write_universal('owner', uuid, from);
     method.addExecution(update);
 
+    // save inventory
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, true);
+    method.addExecution(update);
+
     // ticket balance = ticket balance - 1
     ticket_balance = op.sub([ticket_balance, '1']);
-    update = op.write_universal(op.concat(['balance_', template_id]), from, ticket_balance);
+    update = op.write_universal(op.concat(['balance_', from]), template_id, ticket_balance);
     method.addExecution(update);
 
     return method;

@@ -9,7 +9,7 @@ function getTicketBalance(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "request",
         "name": "GetTicketBalance",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -19,7 +19,7 @@ function getTicketBalance(writer, space) {
 
     let address = op.load_param('address');
     let template_id = op.load_param('id');
-    let balance = op.read_universal(op.concat(['balance_', template_id]), address, '0');
+    let balance = op.read_universal(op.concat(['balance_', address]), template_id, '0');
 
     // return balance
     response = op.response(balance);

@@ -9,7 +9,7 @@ function send(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Send",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -34,6 +34,14 @@ function send(writer, space) {
 
     // owner = to;
     update = op.write_universal('owner', uuid, to);
+    method.addExecution(update);
+
+    // inventory: from = false
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, false);
+    method.addExecution(update);
+
+    // inventory: to = true
+    update = op.write_universal(op.concat(['inventory_', to]), uuid, true);
     method.addExecution(update);
 
     return method;

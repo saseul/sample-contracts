@@ -9,7 +9,7 @@ function addTemplate(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "AddTemplate",
-        "version": "2",
+        "version": "4",
         "space": space,
         "writer": writer,
     });

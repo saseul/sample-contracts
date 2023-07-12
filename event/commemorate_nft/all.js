@@ -24,8 +24,19 @@ module.exports = {
     deposit,
     approve,
     cancel,
-    getOrder
+    getOrder,
+    listExchanger
 };
+
+// manager: address
+// template: id
+// supply: id
+// exchanger: id
+// generator: '00'
+// order: '00'
+//
+// balance_<address>
+// inventory_<address>
 
 function grant(writer, space) {
     let condition, err_msg, update;
@@ -123,7 +134,7 @@ function addTemplate(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "AddTemplate",
-        "version": "2",
+        "version": "4",
         "space": space,
         "writer": writer,
     });
@@ -229,7 +240,7 @@ function createTicket(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "CreateTicket",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -247,7 +258,7 @@ function createTicket(writer, space) {
     let to = op.load_param('to');
     let amount = op.load_param('amount');
 
-    let balance = op.read_universal(op.concat(['balance_', template_id]), to, '0');
+    let balance = op.read_universal(op.concat(['balance_', to]), template_id, '0');
     let supply = op.read_universal('supply', template_id, '0');
 
     // from === writer || is_manager === true
@@ -281,7 +292,7 @@ function createTicket(writer, space) {
 
     // balance = balance + amount
     balance = op.add([ balance, amount ]);
-    update = op.write_universal(op.concat(['balance_', template_id]), to, balance);
+    update = op.write_universal(op.concat(['balance_', to]), template_id, balance);
     method.addExecution(update);
 
     return method;
@@ -292,7 +303,7 @@ function burnTicket(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "BurnTicket",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -309,7 +320,7 @@ function burnTicket(writer, space) {
     let to = op.load_param('to');
     let amount = op.load_param('amount');
 
-    let balance = op.read_universal(op.concat(['balance_', template_id]), to, '0');
+    let balance = op.read_universal(op.concat(['balance_', to]), template_id, '0');
     let supply = op.read_universal('supply', template_id, '0');
 
     // from === writer || is_manager === true
@@ -336,8 +347,62 @@ function burnTicket(writer, space) {
 
     // balance = balance - amount
     balance = op.sub([ balance, amount ]);
-    update = op.write_universal(op.concat(['balance_', template_id]), to, balance);
+    update = op.write_universal(op.concat(['balance_', to]), template_id, balance);
     method.addExecution(update);
+
+    return method;
+}
+
+function listTicketBalance(writer, space) {
+    let response;
+    let method = new SASEUL.SmartContract.Method({
+        "type": "request",
+        "name": "ListTicketBalance",
+        "version": "1",
+        "space": space,
+        "writer": writer,
+    });
+
+    method.addParameter({"name": "address", "type": "string", "maxlength": SASEUL.Enc.ID_HASH_SIZE, "requirements": true});
+    method.addParameter({"name": "page", "type": "int", "maxlength": 5, "requirements": true});
+    method.addParameter({"name": "count", "type": "int", "maxlength": 4, "requirements": true});
+
+    let address = op.load_param('address');
+    let page = op.load_param('page');
+    let count = op.load_param('count');
+
+    page = op.sub([page, 1]);
+
+    // return list
+    let list = op.list_universal(op.concat(['balance_', address]), page, count);
+    response = op.response(list);
+    method.addExecution(response);
+
+    return method;
+}
+
+function listTicketSupply(writer, space) {
+    let response;
+    let method = new SASEUL.SmartContract.Method({
+        "type": "request",
+        "name": "ListTicketSupply",
+        "version": "1",
+        "space": space,
+        "writer": writer,
+    });
+
+    method.addParameter({"name": "page", "type": "int", "maxlength": 5, "requirements": true});
+    method.addParameter({"name": "count", "type": "int", "maxlength": 4, "requirements": true});
+
+    let page = op.load_param('page');
+    let count = op.load_param('count');
+
+    page = op.sub([page, 1]);
+
+    // return list
+    let list = op.list_universal('supply', page, count);
+    response = op.response(list);
+    method.addExecution(response);
 
     return method;
 }
@@ -347,7 +412,7 @@ function getTicketBalance(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "request",
         "name": "GetTicketBalance",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -357,7 +422,7 @@ function getTicketBalance(writer, space) {
 
     let address = op.load_param('address');
     let template_id = op.load_param('id');
-    let balance = op.read_universal(op.concat(['balance_', template_id]), address, '0');
+    let balance = op.read_universal(op.concat(['balance_', address]), template_id, '0');
 
     // return balance
     response = op.response(balance);
@@ -393,7 +458,7 @@ function mint(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Mint",
-        "version": "3",
+        "version": "4",
         "space": space,
         "writer": writer,
     });
@@ -407,7 +472,7 @@ function mint(writer, space) {
     let tx_hash = op.load_param('hash');
     let uuid = op.id_hash(tx_hash);
 
-    let ticket_balance = op.read_universal(op.concat(['balance_', template_id]), from, '0');
+    let ticket_balance = op.read_universal(op.concat(['balance_', from]), template_id, '0');
     let owner = op.read_universal('owner', uuid);
 
     // balance > 0
@@ -436,9 +501,13 @@ function mint(writer, space) {
     update = op.write_universal('owner', uuid, from);
     method.addExecution(update);
 
+    // save inventory
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, true);
+    method.addExecution(update);
+
     // ticket balance = ticket balance - 1
     ticket_balance = op.sub([ticket_balance, '1']);
-    update = op.write_universal(op.concat(['balance_', template_id]), from, ticket_balance);
+    update = op.write_universal(op.concat(['balance_', from]), template_id, ticket_balance);
     method.addExecution(update);
 
     return method;
@@ -483,6 +552,32 @@ function addExchanger(writer, space) {
     // set exchanger
     update = op.write_universal('exchanger', output_id, input_id);
     method.addExecution(update);
+
+    return method;
+}
+
+function listExchanger(writer, space) {
+    let response;
+    let method = new SASEUL.SmartContract.Method({
+        "type": "request",
+        "name": "ListExchanger",
+        "version": "1",
+        "space": space,
+        "writer": writer,
+    });
+
+    method.addParameter({"name": "page", "type": "int", "maxlength": 5, "requirements": true});
+    method.addParameter({"name": "count", "type": "int", "maxlength": 4, "requirements": true});
+
+    let page = op.load_param('page');
+    let count = op.load_param('count');
+
+    page = op.sub([page, 1]);
+
+    // return list
+    let list = op.list_universal('exchanger', page, count);
+    response = op.response(list);
+    method.addExecution(response);
 
     return method;
 }
@@ -549,12 +644,30 @@ function setGenerator(writer, space) {
     return method;
 }
 
+function getGenerator(writer, space) {
+    let response;
+    let method = new SASEUL.SmartContract.Method({
+        "type": "request",
+        "name": "GetGenerator",
+        "version": "1",
+        "space": space,
+        "writer": writer,
+    });
+
+    // return generator item
+    let generator = op.read_universal('generator', '00', {});
+    response = op.response(generator);
+    method.addExecution(response);
+
+    return method;
+}
+
 function takeTicket(writer, space) {
     let condition, err_msg, update;
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "TakeTicket",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -573,7 +686,7 @@ function takeTicket(writer, space) {
     let output_id = op.load_param('output_id');
 
     let exchanger = op.read_universal('exchanger', output_id);
-    let balance = op.read_universal(op.concat(['balance_', output_id]), from, '0');
+    let balance = op.read_universal(op.concat(['balance_', from]), output_id, '0');
     let supply = op.read_universal('supply', output_id, '0');
 
     // exchanger !== null
@@ -603,7 +716,7 @@ function takeTicket(writer, space) {
 
     // balance = balance + 1
     balance = op.add([ balance, '1' ]);
-    update = op.write_universal(op.concat(['balance_', output_id]), from, balance);
+    update = op.write_universal(op.concat(['balance_', from]), output_id, balance);
     method.addExecution(update);
 
     return method;
@@ -614,7 +727,7 @@ function generate(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Generate",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -658,7 +771,7 @@ function generate(writer, space) {
     let input_id4 = op.get(generator, 'input4');
     let output_id = op.get(generator, 'output');
 
-    let balance = op.read_universal(op.concat(['balance_', output_id]), from, '0');
+    let balance = op.read_universal(op.concat(['balance_', from]), output_id, '0');
     let supply = op.read_universal('supply', output_id, '0');
 
     // generator !== null
@@ -703,7 +816,7 @@ function generate(writer, space) {
 
     // balance = balance + 1
     balance = op.add([ balance, '1' ]);
-    update = op.write_universal(op.concat(['balance_', output_id]), from, balance);
+    update = op.write_universal(op.concat(['balance_', from]), output_id, balance);
     method.addExecution(update);
 
     return method;
@@ -771,12 +884,40 @@ function listToken(writer, space) {
     return method;
 }
 
+function listInventory(writer, space) {
+    let response;
+    let method = new SASEUL.SmartContract.Method({
+        "type": "request",
+        "name": "ListInventory",
+        "version": "1",
+        "space": space,
+        "writer": writer,
+    });
+
+    method.addParameter({"name": "address", "type": "string", "maxlength": SASEUL.Enc.ID_HASH_SIZE, "requirements": true});
+    method.addParameter({"name": "page", "type": "int", "maxlength": 5, "requirements": true});
+    method.addParameter({"name": "count", "type": "int", "maxlength": 4, "requirements": true});
+
+    let address = op.load_param('address');
+    let page = op.load_param('page');
+    let count = op.load_param('count');
+
+    page = op.sub([page, 1]);
+
+    // return list
+    let list = op.list_universal(op.concat(['inventory_', address]), page, count);
+    response = op.response(list);
+    method.addExecution(response);
+
+    return method;
+}
+
 function send(writer, space) {
     let condition, err_msg, update;
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Send",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -803,6 +944,14 @@ function send(writer, space) {
     update = op.write_universal('owner', uuid, to);
     method.addExecution(update);
 
+    // inventory: from = false
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, false);
+    method.addExecution(update);
+
+    // inventory: to = true
+    update = op.write_universal(op.concat(['inventory_', to]), uuid, true);
+    method.addExecution(update);
+
     return method;
 }
 
@@ -811,7 +960,7 @@ function deposit(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Deposit",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -860,6 +1009,10 @@ function deposit(writer, space) {
     update = op.write_universal('owner', uuid, 'deposited');
     method.addExecution(update);
 
+    // inventory: from = false
+    update = op.write_universal(op.concat(['inventory_', from]), uuid, false);
+    method.addExecution(update);
+
     // set order
     update = op.write_universal('order', order_id, order);
     method.addExecution(update);
@@ -872,7 +1025,7 @@ function approve(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Approve",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -911,6 +1064,10 @@ function approve(writer, space) {
     update = op.write_universal('owner', order_uuid, order_to);
     method.addExecution(update);
 
+    // inventory: to = true
+    update = op.write_universal(op.concat(['inventory_', order_to]), order_uuid, true);
+    method.addExecution(update);
+
     // set order
     update = op.write_universal('order', order_id, {
         "from": order_from,
@@ -931,7 +1088,7 @@ function cancel(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Cancel",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -973,6 +1130,10 @@ function cancel(writer, space) {
 
     // owner = from;
     update = op.write_universal('owner', order_uuid, order_from);
+    method.addExecution(update);
+
+    // inventory: from = true
+    update = op.write_universal(op.concat(['inventory_', order_from]), order_uuid, true);
     method.addExecution(update);
 
     // set order

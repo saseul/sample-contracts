@@ -9,7 +9,7 @@ function burnTicket(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "BurnTicket",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -26,7 +26,7 @@ function burnTicket(writer, space) {
     let to = op.load_param('to');
     let amount = op.load_param('amount');
 
-    let balance = op.read_universal(op.concat(['balance_', template_id]), to, '0');
+    let balance = op.read_universal(op.concat(['balance_', to]), template_id, '0');
     let supply = op.read_universal('supply', template_id, '0');
 
     // from === writer || is_manager === true
@@ -53,7 +53,7 @@ function burnTicket(writer, space) {
 
     // balance = balance - amount
     balance = op.sub([ balance, amount ]);
-    update = op.write_universal(op.concat(['balance_', template_id]), to, balance);
+    update = op.write_universal(op.concat(['balance_', to]), template_id, balance);
     method.addExecution(update);
 
     return method;

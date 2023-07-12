@@ -9,7 +9,7 @@ function approve(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Approve",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -46,6 +46,10 @@ function approve(writer, space) {
 
     // owner = to;
     update = op.write_universal('owner', order_uuid, order_to);
+    method.addExecution(update);
+
+    // inventory: to = true
+    update = op.write_universal(op.concat(['inventory_', order_to]), order_uuid, true);
     method.addExecution(update);
 
     // set order
