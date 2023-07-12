@@ -11,21 +11,25 @@ module.exports = {
     readTemplate,
     createTicket,
     burnTicket,
+    listTicketBalance,
+    listTicketSupply,
     getTicketBalance,
     getTicketSupply,
     mint,
     addExchanger,
+    listExchanger,
     setGenerator,
+    getGenerator,
     takeTicket,
     generate,
     getInfo,
     listToken,
+    listInventory,
     send,
     deposit,
     approve,
     cancel,
-    getOrder,
-    listExchanger
+    getOrder
 };
 
 // manager: address
