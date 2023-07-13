@@ -835,7 +835,7 @@ function getInfo(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "request",
         "name": "GetInfo",
-        "version": "2",
+        "version": "3",
         "space": space,
         "writer": writer,
     });
@@ -846,6 +846,7 @@ function getInfo(writer, space) {
     let info = op.read_universal('info', uuid);
     let owner = op.read_universal('owner', uuid);
     let used = op.read_universal('used', uuid);
+    let carved = op.read_universal('carved', uuid);
     let generation_used = op.read_universal('generation_used', uuid);
 
     // info !== null ?
@@ -858,6 +859,7 @@ function getInfo(writer, space) {
         "uuid": uuid,
         "owner": owner,
         "used": used,
+        "carved": carved,
         "generation_used": generation_used,
         "info": info
     });
