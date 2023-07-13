@@ -462,7 +462,7 @@ function mint(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Mint",
-        "version": "4",
+        "version": "5",
         "space": space,
         "writer": writer,
     });
