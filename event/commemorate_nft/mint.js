@@ -52,6 +52,10 @@ function mint(writer, space) {
     update = op.write_universal('owner', uuid, from);
     method.addExecution(update);
 
+    // save carved
+    update = op.write_universal('carved', uuid, tx_hash);
+    method.addExecution(update);
+
     // save inventory
     update = op.write_universal(op.concat(['inventory_', from]), uuid, true);
     method.addExecution(update);
