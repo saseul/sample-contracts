@@ -733,14 +733,16 @@ function confirm(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Confirm",
-        "version": "1",
+        "version": "2",
         "space": space,
         "writer": writer,
     });
 
+    method.addParameter({"name": "to", "type": "string", "maxlength": SASEUL.Enc.ID_HASH_SIZE, "requirements": true});
     method.addParameter({"name": "entry_id", "type": "string", "maxlength": SASEUL.Enc.HASH_SIZE, "requirements": true});
     method.addParameter({"name": "auth_token", "type": "string", "maxlength": SASEUL.Enc.HASH_SIZE, "requirements": true,});
 
+    let to = op.load_param('to');
     let entry_id = op.load_param('entry_id');
     let auth_token = op.load_param('auth_token');
 
@@ -753,7 +755,12 @@ function confirm(writer, space) {
     let entry_auth_key = op.get(existing_entry, 'auth_key');
     let entry_status = op.get(existing_entry, 'status');
 
-    let to_balance = op.read_universal('balance', entry_to, '0');
+    let to_balance = op.read_universal('balance', to, '0');
+
+    // to === entry_to
+    condition = op.eq(to, entry_to);
+    err_msg = 'The "to" address must be the same as the recipient. ';
+    method.addExecution(op.condition(condition, err_msg));
 
     // existing_entry !== null
     condition = op.ne(existing_entry, null);

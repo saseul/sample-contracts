@@ -9,7 +9,7 @@ function generate(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "Generate",
-        "version": "3",
+        "version": "4",
         "space": space,
         "writer": writer,
     });
@@ -90,6 +90,19 @@ function generate(writer, space) {
     ]);
     err_msg = 'You must be the owner of all tokens.';
     method.addExecution(op.condition(condition, err_msg));
+
+    // used = true;
+    update = op.write_universal('generation_used', uuid1, true);
+    method.addExecution(update);
+
+    update = op.write_universal('generation_used', uuid2, true);
+    method.addExecution(update);
+
+    update = op.write_universal('generation_used', uuid3, true);
+    method.addExecution(update);
+
+    update = op.write_universal('generation_used', uuid4, true);
+    method.addExecution(update);
 
     // supply = supply + 1
     supply = op.add([ supply, '1' ]);

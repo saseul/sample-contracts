@@ -9,7 +9,7 @@ function takeTicket(writer, space) {
     let method = new SASEUL.SmartContract.Method({
         "type": "contract",
         "name": "TakeTicket",
-        "version": "3",
+        "version": "5",
         "space": space,
         "writer": writer,
     });
@@ -50,6 +50,10 @@ function takeTicket(writer, space) {
     condition = op.eq(owner, from);
     err_msg = 'You are not the owner of the token.';
     method.addExecution(op.condition(condition, err_msg));
+
+    // used = true
+    update = op.write_universal('used', uuid, true);
+    method.addExecution(update);
 
     // supply = supply + 1
     supply = op.add([ supply, '1' ]);
